@@ -1,8 +1,6 @@
 
 import os
 import pandas as pd
-from PIL import Image, ImageDraw, ImageChops
-import matplotlib.pyplot as plt
 import csv
 import numpy as np
 

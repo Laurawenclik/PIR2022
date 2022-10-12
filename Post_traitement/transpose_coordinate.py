@@ -13,13 +13,13 @@ import json
 # info.player.json est dans le dossier produit par l'acquisition (il permet de calculer le temps réel)
 
 
-
+# attention de changer les chemins d'accès
 f = open('recordings/info.player.json',)
 json_time = json.load(f)
 
 
 start_time_system = float(json_time["start_time_system_s"]) # System Time at recording start
-start_time_synced = float(json_time["start_time_synced_s"])     # Pupil Time at recording start
+start_time_synced = float(json_time["start_time_synced_s"])# Pupil Time at recording start
 # Calculate the fixed offset between System and Pupil Time
 offset = start_time_system - start_time_synced
 
@@ -36,15 +36,14 @@ assert os.path.exists(path_to_resultat)
 resultat = pd.read_csv(path_to_resultat)
 
 coord_fixation =[]
-# box_coordinate = [565051,6527555,565676,6527850]#(xmin,ymin,xmax,ymax)
 
 box_carte = [8/1920,(1080-(600+140))/1080,(1142+8)/1920,(1080-140)/1080] # a calculer en pourcentage (xmin,ymin,xmax,ymax)
 
+#récupération de l'état de la carte au temps timestamp 
 def box_coord(timestamp):
     box = [0,0,0,0]
     zoom = 0
     etape = 1
-
     for t in range(len(resultat)):
         if (timestamp+offset)*1000 >= resultat["time"][t]:
             zoom = resultat["zoom"][t]
@@ -53,8 +52,9 @@ def box_coord(timestamp):
             continue
         else:
             break
-    
     return box,zoom,etape
+
+
 for k in range(len(fixation)):
     id = fixation["fixation_id"][k]
     if int(fixation["world_index"][k]) > 10: # on enleve les points de debut lors du lancement de l'acquisition 

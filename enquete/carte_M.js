@@ -121,15 +121,35 @@ var data = [
   "fdc": "geoportail"}
 ];
 
+var tab= [];
+var tab_desorientation = [];
+var centre_ini;
+var centre_f;
+var zoom_ini;
+var zoom_f;
+var vitesse;
+var action;
+var etape_suiv;
+var interval;
+var interval_ajout;
+var fdc;
+var centre_f_g;
+var centre_ini_g
+var numero_enquete;
+var etape;
+var iteratin_max = data.length/4;
+// récupération des élèment HTML
 var but = document.getElementById("but");
 var slider = document.getElementById("myRange");
 var valeur_slider = document.getElementById("valeur_slider");
+// permet de mettre à jour la valeur du slider
 slider.oninput = function() {
   valeur_slider.innerHTML = this.value;
 }
 
 var map;
 var map_g; 
+// initialisation des fond de carte OSM et géoportail 
 var raster = new ol.layer.Tile({
   source: new ol.source.OSM(),
   // visible: false
@@ -160,58 +180,46 @@ var ignlayer = new ol.layer.Tile({
   }),
   visible:false
 })
-var numero_enquete;
-var etape;
+
 /* Déclaration des couches*/
 var couches = [raster,ignlayer]; 
 
-
+/*
+fonction toogle : permet de changer le fond de carte (dans le cadre OSM et géoportail) ou de changer la carte visible (google)
+*/
 function toggle() {
   if (fdc == "geoportail"){
+    //réinitialise les visibilites des div
     document.getElementById("map").style.display = "block";
     document.getElementById("map_g").style.display = "none";
-    // raster_g.setVisible(true);
+    // visibilité du raster geoportail 
     raster.setVisible(false);
     ignlayer.setVisible(true);
 
   }else if(fdc == "OSM"){
+    //réinitialise les visibilites des div
     document.getElementById("map").style.display = "block";
     document.getElementById("map_g").style.display = "none";
-    // raster_g.setVisible(false);
+    // visibilité du raster OSM     
     raster.setVisible(true);
     ignlayer.setVisible(false);
   }
   else{
+    //réinitialise les visibilites des div
     document.getElementById("map").style.display = "none";
     document.getElementById("map_g").style.display = "block";
-
-
   }
-
 };
 
 
-var tab= [];
-var tab_desorientation = [];
-var centre_ini;
-var centre_f;
-var zoom_ini;
-var zoom_f;
-var vitesse;
-var action;
-var etape_suiv;
-var interval;
-var interval_ajout;
-var fdc;
-var centre_f_g;
-var centre_ini_g
-var iteratin_max = data.length/4;
 
+/*
+fonction ajout : permet connaitre les coordonnées de la carte 
+*/
 function ajout(){
   let date = Date.now()
   let zoom;
   let coord;
-
   if(fdc == "google"){
     zoom = map_g.getZoom();
     let so = [map_g.getBounds().getSouthWest().lat(),map_g.getBounds().getSouthWest().lng()];
@@ -228,15 +236,19 @@ function ajout(){
   tab.push([date,zoom,coord,etape])
 }
 
-
+/*
+fonction animation : permet de créer une animation de la carte (zoom ou pan )
+*/
 function animation(){
   if(fdc == "google"){
     map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
     map_g.setZoom(zoom_ini);
+    // création d'une vue OL 
     const view_g = new ol.View({
       center: centre_ini,
       zoom: zoom_ini
     });
+    //synchronisation de la vue avec la cart google
     function sync() {
       const center = ol.proj.transform(view_g.getCenter(), 'EPSG:3857', 'EPSG:4326');
       const cameraOptions = {
@@ -276,7 +288,9 @@ function animation(){
 
 
 }
-
+/*
+fonction fin : création des fichiers d'export 
+*/
 function fin(){
   clearInterval(interval);
   clearInterval(interval_ajout);
@@ -293,6 +307,9 @@ function fin(){
   console.log(tab_desorientation)
 }
 
+/*
+fonction etape_suivante : fonction récursive, récupère les donnée de l'etape suivante et met à jour la carte 
+*/
 function etape_suivante(){
   tab_desorientation.push(slider.value);
   console.log(slider.value)
