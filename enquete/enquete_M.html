@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      .map {
+        height: 600px;
+        width: 1142px;
+        float:left;
+      }
+      #but {
+        margin-left:60%   
+      }
+      #slidecontainer{
+        display:none;
+      }
+
+
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v7.1.0/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.1.0/ol.css">
+    <!-- <link rel="stylesheet" href="ol3gm.css" type="text/css" /> -->
+    <title>Se repérer sur une carte</title>
+  </head>
+  <body>
+    <h2>Carte</h2>
+    
+    <div id="map" class="map"></div>
+    <div id="map_g" class="map"></div>
+    
+    <div id="but">
+      <button id="E1" value="1" onclick="debut(this.value)">Enquête 1</button>
+      <button id="E2" value="2" onclick="debut(this.value)">Enquête 2</button>
+      <button id="E3" value="3" onclick="debut(this.value)">Enquête 3</button>
+      <button id="E4" value="4" onclick="debut(this.value)">Enquête 4</button>
+      <div id="slidecontainer">
+        <input type="range" min="0" max="5" value="2" class="slider" id="myRange">
+        <p>désorientation: <span id="valeur_slider"></span></p>
+      </div>
+    </div>
+
+
+    
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=KEY"></script>
+    <!-- <script src="ol3gm.js"></script> -->
+    <script type="text/javascript" src="carte_M.js"></script>
+
+
+  </body>
+  
+</html>
