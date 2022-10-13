@@ -8,6 +8,7 @@ var data = [
   "zoom_ini" :19,
   "zoom_f" :  12,
   "enquete" : 1,
+  "nbr_action": 2,
   "fdc": "google"},
   {"interaction" : 2,
   "etape" : 1,
@@ -18,6 +19,7 @@ var data = [
   "zoom_ini" :11,
   "zoom_f" :  15,
   "enquete" : 2,
+  "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 3,
   "etape" : 1,
@@ -28,6 +30,7 @@ var data = [
   "zoom_ini" :11,
   "zoom_f" :  15,
   "enquete" : 3,
+  "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 4,
   "etape" : 1,
@@ -38,16 +41,18 @@ var data = [
   "zoom_ini" :11,
   "zoom_f" :  14,
   "enquete" : 4,
+  "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 5,
-  "etape" : 2,
-  "center_ini" : [2.349435,48.8547601],
-  "center_f" :  [2.349435,48.8547601],
+  "etape" : 4,
+  "center_ini" : [6.7986539,45.6372829],
+  "center_f" :  [6.7986539,45.6372829],
   "action" : "dezoom",
   "time" : 8000,
   "zoom_ini" :19,
   "zoom_f" :  12,
   "enquete" : 1,
+  "nbr_action": 4,
   "fdc": "geoportail"},
   {"interaction" : 6,
   "etape" : 2,
@@ -58,6 +63,7 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  6,
   "enquete" : 2,
+  "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" : 7,
   "etape" : 2,
@@ -68,6 +74,7 @@ var data = [
   "zoom_ini" :19,
   "zoom_f" :  14,
   "enquete" : 3,
+  "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" :8,
   "etape" : 2,
@@ -78,6 +85,7 @@ var data = [
   "zoom_ini" :15,
   "zoom_f" :  11,
   "enquete" : 4,
+  "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" : 9,
   "etape" : 3,
@@ -85,10 +93,11 @@ var data = [
   "center_f" :  [-1.5475042,53.7945202],
   "action" : "pan",
   "time" : 8000,
-  "zoom_ini" :8,
-  "zoom_f" :  8,
+  "zoom_ini" :16,
+  "zoom_f" :  16,
   "enquete" : 1,
-  "fdc": "geoportail"},
+  "nbr_action": 4,
+  "fdc": "OSM"},
   {"interaction" : 10,
   "etape" : 3,
   "center_ini" : [-1.5552045,53.8067512],
@@ -98,6 +107,7 @@ var data = [
   "zoom_ini" :18,
   "zoom_f" :  8,
   "enquete" : 2,
+  "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 11,
   "etape" : 3,
@@ -108,6 +118,7 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  8,
   "enquete" : 3,
+  "nbr_action": 1,
   "fdc": "geoportail"},
   {"interaction" : 12,
   "etape" : 3,
@@ -118,6 +129,7 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  8,
   "enquete" : 4,
+  "nbr_action": 1,
   "fdc": "geoportail"}
 ];
 
@@ -138,6 +150,7 @@ var centre_ini_g
 var numero_enquete;
 var etape;
 var iteratin_max = data.length/4;
+var nbr_action;
 // récupération des élèment HTML
 var but = document.getElementById("but");
 var slider = document.getElementById("myRange");
@@ -240,6 +253,7 @@ function ajout(){
 fonction animation : permet de créer une animation de la carte (zoom ou pan )
 */
 function animation(){
+  let etat_etape = etape;
   if(fdc == "google"){
     map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
     map_g.setZoom(zoom_ini);
@@ -259,31 +273,71 @@ function animation(){
     }
     
     view_g.on(['change:center', 'change:resolution'], sync);
-    if( action == "pan"){
-      view_g.animate({
-        duration: vitesse,
-        center: centre_f
-      });
-    }else{
-      view_g.animate({
-        duration: vitesse,
-        zoom: zoom_f
+
+
+    let liste_animation = [];
+    for (let k = 0; k<nbr_action;k++){
+      let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
+      let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
+      liste_animation.push(
+      {
+      duration: vitesse/nbr_action,
+      center: centre_f_intermediaire,
+      zoom: zoom_f_intermediaire
+      }
+      )
+    }
+      
+    fullanimation_g(liste_animation, 0, function() {
+      console.log("c'est fini!!!")
+    })
+
+    function fullanimation_g(list, i, callback) {
+      view_g.animate(list[i], function() {
+        ++i;
+        if (i >= list.length) {
+          callback(i);
+        }else if(etape != etat_etape) {
+          callback(i);
+        } else {
+          fullanimation_g(list, i, callback);
+        }
       });
     }
+    
   }else{
     map.getView().setCenter(centre_ini);
     map.getView().setZoom(zoom_ini);
-    if( action == "pan"){
-      map.getView().animate({
-        duration: vitesse,
-        center: centre_f
-      });
-    }else{
-      map.getView().animate({
-        duration: vitesse,
-        zoom: zoom_f
+    let liste_animation = [];
+    for (let k = 0; k<nbr_action;k++){
+      let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
+      let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
+      liste_animation.push(
+      {
+        duration: vitesse/nbr_action,
+        center: centre_f_intermediaire,
+        zoom: zoom_f_intermediaire
+      }
+      )
+    }
+      
+    fullanimation(liste_animation, 0, function() {
+      console.log("c'est fini!!!")
+    })
+
+    function fullanimation(list, i, callback) {
+      map.getView().animate(list[i], function() {
+        ++i;
+        if (i >= list.length) {
+          callback(i);
+        }else if(etape != etat_etape) {
+          callback(i);
+        } else {
+          fullanimation(list, i, callback);
+        }
       });
     }
+
   }
 
 
@@ -311,11 +365,16 @@ function fin(){
 fonction etape_suivante : fonction récursive, récupère les donnée de l'etape suivante et met à jour la carte 
 */
 function etape_suivante(){
+  //récupération de la valeur du slider
   tab_desorientation.push(slider.value);
-  console.log(slider.value)
+  //réinitialisation du slider
   slider.value = 2;
   valeur_slider.innerHTML = 2;
+  
   if(etape < iteratin_max ){
+    if(etape == iteratin_max-1){
+      document.getElementById('etape_suivante').value = "fin";
+    }
     etape +=1;
     clearInterval(interval);
     var id = (etape-1)*4+numero_enquete-1;
@@ -328,6 +387,7 @@ function etape_suivante(){
     fdc = data[id]["fdc"];
     centre_f_g = ol.proj.transform(centre_f, 'EPSG:3857', 'EPSG:4326');
     centre_ini_g = ol.proj.transform(centre_ini, 'EPSG:3857', 'EPSG:4326');
+    nbr_action = data[id]["nbr_action"];
     if(fdc == "google"){
       map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
       map_g.setZoom(zoom_ini);
@@ -336,9 +396,11 @@ function etape_suivante(){
       map.getView().setZoom(zoom_ini);
     }
     toggle();
-    // animation();
-    interval = setInterval(animation,  vitesse+1000) ;    
+    animation();
+    interval = setInterval(animation,  vitesse+1000) ;
+        
   }else{
+    
     fin()
   }
 }
@@ -358,6 +420,7 @@ function debut(value) {
   vitesse = data[value-1]["time"];
   action = data[value-1]["action"];
   fdc = data[value-1]["fdc"];
+  nbr_action = data[value-1]["nbr_action"];
   etape = 1;
   centre_f_g = ol.proj.transform(centre_f, 'EPSG:3857', 'EPSG:4326');
   centre_ini_g = ol.proj.transform(centre_ini, 'EPSG:3857', 'EPSG:4326');
@@ -367,7 +430,6 @@ function debut(value) {
   });
   map = new ol.Map({
     /* Appel des couches de la carte */
-    // interactions: olgm.interaction.defaults(),
     layers: couches,
     /* Cible de la div map */
     target: 'map',
@@ -379,9 +441,10 @@ function debut(value) {
   });
   document.getElementById("map").style.display = "none";
 
-  var r='<button id="etape_suivante" name="envoie">Etape suivante</button>';
+  var r='<input id="etape_suivante" type="button" name="envoie" value="Etape suivante">';
   $("#but").append(r);
   document.getElementById('etape_suivante').addEventListener('click',etape_suivante);
+  animation();
   interval = setInterval(animation, vitesse+1000) ;
   interval_ajout = setInterval(ajout, 100) ;
 }
