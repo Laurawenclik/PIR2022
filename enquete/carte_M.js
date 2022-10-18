@@ -48,7 +48,7 @@ var data = [
   "center_ini" : [6.7986539,45.6372829],
   "center_f" :  [6.7986539,45.6372829],
   "action" : "dezoom",
-  "time" : 8000,
+  "time" : 5000,
   "zoom_ini" :19,
   "zoom_f" :  12,
   "enquete" : 1,
@@ -151,9 +151,12 @@ var numero_enquete;
 var etape;
 var iteratin_max = data.length/4;
 var nbr_action;
+var nbr_iteration = 0;
 // récupération des élèment HTML
 var but = document.getElementById("but");
 var slider = document.getElementById("myRange");
+var text = document.getElementById("desorientation");
+
 var valeur_slider = document.getElementById("valeur_slider");
 // permet de mettre à jour la valeur du slider
 slider.oninput = function() {
@@ -274,7 +277,6 @@ function animation(){
     
     view_g.on(['change:center', 'change:resolution'], sync);
 
-
     let liste_animation = [];
     for (let k = 0; k<nbr_action;k++){
       let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
@@ -289,7 +291,7 @@ function animation(){
     }
       
     fullanimation_g(liste_animation, 0, function() {
-      console.log("c'est fini!!!")
+      nbr_iteration +=1;
     })
 
     function fullanimation_g(list, i, callback) {
@@ -322,7 +324,7 @@ function animation(){
     }
       
     fullanimation(liste_animation, 0, function() {
-      console.log("c'est fini!!!")
+      nbr_iteration +=1;
     })
 
     function fullanimation(list, i, callback) {
@@ -357,8 +359,21 @@ function fin(){
   link.setAttribute("download", nom);
   document.body.appendChild(link); 
   link.click();
+  
+
+  
+  let csvContent2 = "data:text/csv;charset=utf-8," +"etape,desorientation,iteration,avis\n"
+    + tab_desorientation.map(e => e.join(",")).join("\n");
+  var encodedUri2 = encodeURI(csvContent2);
+  var link2 = document.createElement("a");
+  link2.setAttribute("href", encodedUri2);
+  let nom2 = "resultat_desorientation.csv"
+  link2.setAttribute("download", nom2);
+  document.body.appendChild(link2); 
+  link2.click();
+
   document.getElementById('etape_suivante').removeEventListener('click',etape_suivante);
-  console.log(tab_desorientation)
+
 }
 
 /*
@@ -366,9 +381,10 @@ fonction etape_suivante : fonction récursive, récupère les donnée de l'etape
 */
 function etape_suivante(){
   //récupération de la valeur du slider
-  tab_desorientation.push(slider.value);
+  tab_desorientation.push([etape,slider.value,nbr_iteration,text.value]);
   //réinitialisation du slider
   slider.value = 2;
+  text.value = "";
   valeur_slider.innerHTML = 2;
   
   if(etape < iteratin_max ){
@@ -376,6 +392,7 @@ function etape_suivante(){
       document.getElementById('etape_suivante').value = "fin";
     }
     etape +=1;
+    nbr_iteration = -1;
     clearInterval(interval);
     var id = (etape-1)*4+numero_enquete-1;
     centre_ini = ol.proj.fromLonLat(data[id]["center_ini"]);
@@ -412,6 +429,7 @@ function debut(value) {
   but.removeChild(document.getElementById("E4"));
   valeur_slider.innerHTML = 2;
   document.getElementById("slidecontainer").style.display = "block";
+
   numero_enquete = parseInt(value);
   centre_ini = ol.proj.fromLonLat(data[value-1]["center_ini"]);
   zoom_ini = data[value-1]["zoom_ini"];
