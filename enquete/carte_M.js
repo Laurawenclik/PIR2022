@@ -324,7 +324,7 @@ function animation(){
     }
       
     fullanimation_g(liste_animation, 0, function() {
-      nbr_iteration +=1;
+      console.log("fin");
       if (nbr_iteration >= nbr_iteration_t){
         clearInterval(interval);
       }
@@ -402,7 +402,7 @@ function fin(){
   
 
   
-  let csvContent2 = "data:text/csv;charset=utf-8," +"etape,desorientation,iteration,avis\n"
+  let csvContent2 = "data:text/csv;charset=utf-8," +"etape,desorientation,iteration\n"
     + tab_desorientation.map(e => e.join(",")).join("\n");
   var encodedUri2 = encodeURI(csvContent2);
   var link2 = document.createElement("a");
@@ -412,8 +412,7 @@ function fin(){
   document.body.appendChild(link2); 
   link2.click();
 
-  document.getElementById('etape_suivante').removeEventListener('click',etape_suivante);
-
+  window.location = 'enquete_question.html'
 }
 
 /*

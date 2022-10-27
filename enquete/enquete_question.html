@@ -14,7 +14,11 @@
       #slidecontainer{
         display:none;
       }
-
+      #desorientation
+      {
+        height:200px ;
+        width: 300px;
+      }
 
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -35,19 +39,18 @@
       <button id="E3" value="3" onclick="debut(this.value)">Enquête 3</button>
       <button id="E4" value="4" onclick="debut(this.value)">Enquête 4</button>
       <div id="slidecontainer">
-        <input type="range" min="0" max="5" value="2" class="slider" id="myRange">
-        <!-- <input type="text" id="desorientation"> -->
 
-        <p>désorientation: <span id="valeur_slider"></span></p>
+        <input type="text" id="desorientation">
+
       </div>
     </div>
 
 
     
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=Key"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=KEY"></script>
     <!-- <script src="ol3gm.js"></script> -->
-    <script type="text/javascript" src="carte_M.js"></script>
+    <script type="text/javascript" src="carte_M_question.js"></script>
 
 
   </body>
