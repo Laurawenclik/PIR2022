@@ -22,7 +22,7 @@ var data = [
     "zoom_f" :  15,
     "enquete" : 2,
     "nbr_action": 1,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "fdc": "google"},
     {"interaction" : 3,
@@ -34,7 +34,7 @@ var data = [
     "zoom_ini" :11,
     "zoom_f" :  15,
     "enquete" : 3,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "google"},
@@ -47,7 +47,7 @@ var data = [
     "zoom_ini" :11,
     "zoom_f" :  14,
     "enquete" : 4,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "google"},
@@ -73,7 +73,7 @@ var data = [
     "zoom_ini" :8,
     "zoom_f" :  6,
     "enquete" : 2,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "OSM"},
@@ -86,7 +86,7 @@ var data = [
     "zoom_ini" :19,
     "zoom_f" :  14,
     "enquete" : 3,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "OSM"},
@@ -99,7 +99,7 @@ var data = [
     "zoom_ini" :15,
     "zoom_f" :  11,
     "enquete" : 4,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "OSM"},
@@ -112,7 +112,7 @@ var data = [
     "zoom_ini" :16,
     "zoom_f" :  16,
     "enquete" : 1,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 4,
     "fdc": "OSM"},
@@ -125,7 +125,7 @@ var data = [
     "zoom_ini" :18,
     "zoom_f" :  8,
     "enquete" : 2,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "google"},
@@ -138,7 +138,7 @@ var data = [
     "zoom_ini" :8,
     "zoom_f" :  8,
     "enquete" : 3,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "geoportail"},
@@ -151,7 +151,7 @@ var data = [
     "zoom_ini" :8,
     "zoom_f" :  8,
     "enquete" : 4,
-    "rotation": 0,
+    "rotation": false,
     'nbr_iteration' :2,
     "nbr_action": 1,
     "fdc": "geoportail"}
@@ -250,74 +250,19 @@ var data = [
   
   
 
-  /*
-  fonction animation : permet de créer une animation de la carte (zoom ou pan )
-  */
   function animation(){
     let etat_etape = etape;
     nbr_iteration +=1;
     if (nbr_iteration > nbr_iteration_t){
       repetition = true;
     }
+  
    
-    if(fdc == "google"){
-      map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
-      map_g.setZoom(zoom_ini);
-      // création d'une vue OL 
-      const view_g = new ol.View({
-        center: centre_ini,
-        zoom: zoom_ini
-      });
-      //synchronisation de la vue avec la cart google
-      function sync() {
-        const center = ol.proj.transform(view_g.getCenter(), 'EPSG:3857', 'EPSG:4326');
-        const cameraOptions = {
-          center: new google.maps.LatLng(center[1], center[0]),
-          zoom: view_g.getZoom()
-        };
-        map_g.moveCamera(cameraOptions);
-      }
-      
-      view_g.on(['change:center', 'change:resolution'], sync);
   
-      let liste_animation = [];
-      for (let k = 0; k<nbr_action;k++){
-        let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
-        let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
-        liste_animation.push(
-        {
-        duration: vitesse/nbr_action,
-        center: centre_f_intermediaire,
-        zoom: zoom_f_intermediaire
-        }
-        )
-      }
-        
-      fullanimation_g(liste_animation, 0, function() {
-        nbr_iteration +=1;
-        if (nbr_iteration >= nbr_iteration_t){
-          clearInterval(interval);
-        }
-      })
-  
-      function fullanimation_g(list, i, callback) {
-        view_g.animate(list[i], function() {
-          ++i;
-          if (i >= list.length) {
-            callback(i);
-          }else if(etape != etat_etape) {
-            callback(i);
-          } else {
-            fullanimation_g(list, i, callback);
-          }
-        });
-      }
-      
-    }else{
-      map.getView().setCenter(centre_ini);
-      map.getView().setZoom(zoom_ini);
-      let liste_animation = [];
-      for (let k = 0; k<nbr_action;k++){
+    map.getView().setCenter(centre_ini);
+    map.getView().setZoom(zoom_ini);
+    let liste_animation = [];
+    for (let k = 0; k<nbr_action;k++){
         let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
         let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
         liste_animation.push(
@@ -327,16 +272,16 @@ var data = [
           zoom: zoom_f_intermediaire
         }
         )
-      }
+    }
         
-      fullanimation(liste_animation, 0, function() {
+    fullanimation(liste_animation, 0, function() {
         console.log("fin");
         if (nbr_iteration > nbr_iteration_t){
           clearInterval(interval);
         }
-      })
+    })
   
-      function fullanimation(list, i, callback) {
+    function fullanimation(list, i, callback) {
         map.getView().animate(list[i], function() {
           ++i;
           if (i >= list.length) {
@@ -348,12 +293,14 @@ var data = [
             fullanimation(list, i, callback);
           }
         });
-      }
-  
     }
+  
+    
   
   
   }
+
+
   /*
   fonction fin : création des fichiers d'export 
   */
@@ -377,14 +324,20 @@ var data = [
   /*
   fonction etape_suivante : fonction récursive, récupère les donnée de l'etape suivante et met à jour la carte 
   */
-  function etape_suivante(){
+
+function etape_suivante(){
     //récupération de la valeur du slider
     tab_desorientation.push([etape,text.value]);
     //réinitialisation du slider
 
     text.value = "";
     
+    if(rotation){
+      map.getView().setRotation(0);
+      
+    }
     if(etape < iteratin_max ){
+  
       if(etape == iteratin_max-1){
         document.getElementById('etape_suivante').value = "fin";
       }
@@ -400,23 +353,18 @@ var data = [
       fdc = data[id]["fdc"];
       nbr_iteration_t = data[id]["nbr_iteration"];
       rotation = data[id]["rotation"];
-      centre_f_g = ol.proj.transform(centre_f, 'EPSG:3857', 'EPSG:4326');
-      centre_ini_g = ol.proj.transform(centre_ini, 'EPSG:3857', 'EPSG:4326');
       nbr_action = data[id]["nbr_action"];
-  
-  
-      if(fdc == "google"){
-        map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
-        map_g.setZoom(zoom_ini);
-      }else{
-        map.getView().setCenter(centre_ini);
-        map.getView().setZoom(zoom_ini);
+      if(rotation){
+        map.getView().setRotation(Math.PI);
+        map_g.setHeading(180);
       }
+  
+      map.getView().setCenter(centre_ini);
+      map.getView().setZoom(zoom_ini);
   
       toggle();
           
     }else{
-      
       fin()
     }
   }
@@ -445,21 +393,41 @@ var data = [
   
   
     map_g = new google.maps.Map(document.getElementById("map_g"), {
-      center: { lat: centre_ini_g[1], lng: centre_ini_g[0] },
-      zoom: zoom_ini
-    });
-    map = new ol.Map({
-      /* Appel des couches de la carte */
-      layers: couches,
-      /* Cible de la div map */
-      target: 'map',
-      /* Caractéristiques de la vue de la carte */
-      view: new ol.View({
-          center: centre_ini,
-          zoom: zoom_ini
-      })
-    });
-    document.getElementById("map").style.display = "none";
+        center: { lat: centre_ini_g[1], lng: centre_ini_g[0] },
+        zoom: zoom_ini,
+      });
+      
+      map = new ol.Map({
+        /* Appel des couches de la carte */
+        layers: couches,
+        /* Cible de la div map */
+        target: 'map',
+        /* Caractéristiques de la vue de la carte */
+        view: new ol.View({
+            center: centre_ini,
+            zoom: zoom_ini
+        })
+      });
+    
+      function sync() {
+        const center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+    
+        const cameraOptions = {
+          center: new google.maps.LatLng(center[1], center[0]),
+          zoom: map.getView().getZoom(),
+        };
+        map_g.moveCamera(cameraOptions);
+      }
+      
+      map.getView().on(['change:center', 'change:resolution'], sync);
+    
+    
+      if(rotation){
+        map.getView().setRotation(Math.PI);
+       
+      }
+    
+      toggle();
   
     var r='<input id="etape_suivante" type="button" name="envoie" value="Etape suivante">';
     var r2 = '<input id="rejouer" type="button" value="Rejouer">';
@@ -472,9 +440,11 @@ var data = [
   
   
   
+  
+
+
+  
+  
     
   
   
-  
-   
-   

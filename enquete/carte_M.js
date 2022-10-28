@@ -11,7 +11,7 @@ var data = [
   "nbr_action": 2, // nombre de pan / zoom pour interaction
   "rotation": true,  // rotation de la carte si besoin 
   'nbr_iteration' :3, // nombre de fois que l'interaction de déroule 
-  "fdc": "google"}, // fdc
+  "fdc": "OSM"}, // fdc
   {"interaction" : 2,
   "etape" : 1,
   "center_ini" : [6.7986539,45.6372829],
@@ -63,7 +63,7 @@ var data = [
   'nbr_iteration' :2,
   "rotation": true,
   "nbr_action": 4,
-  "fdc": "geoportail"},
+  "fdc": "google"},
   {"interaction" : 6,
   "etape" : 2,
   "center_ini" : [6.7986539,45.6372829],
@@ -282,17 +282,6 @@ function animation(){
     repetition = true;
   }
 
-  function sync() {
-    const center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-
-    const cameraOptions = {
-      center: new google.maps.LatLng(center[1], center[0]),
-      zoom: map.getView().getZoom(),
-    };
-    map_g.moveCamera(cameraOptions);
-  }
-  
-  map.getView().on(['change:center', 'change:resolution'], sync);
  
 
   map.getView().setCenter(centre_ini);
@@ -383,6 +372,7 @@ function etape_suivante(){
   repetition = false;
   if(rotation){
     map.getView().setRotation(0);
+    
   }
   if(etape < iteratin_max ){
 
@@ -405,6 +395,7 @@ function etape_suivante(){
     nbr_action = data[id]["nbr_action"];
     if(rotation){
       map.getView().setRotation(Math.PI);
+      map_g.setHeading(180);
     }
 
     map.getView().setCenter(centre_ini);
@@ -445,7 +436,7 @@ function debut(value) {
 
   map_g = new google.maps.Map(document.getElementById("map_g"), {
     center: { lat: centre_ini_g[1], lng: centre_ini_g[0] },
-    zoom: zoom_ini
+    zoom: zoom_ini,
   });
   
   map = new ol.Map({
@@ -460,24 +451,31 @@ function debut(value) {
     })
   });
 
+  function sync() {
+    const center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+
+    const cameraOptions = {
+      center: new google.maps.LatLng(center[1], center[0]),
+      zoom: map.getView().getZoom(),
+    };
+    map_g.moveCamera(cameraOptions);
+  }
+  
+  map.getView().on(['change:center', 'change:resolution'], sync);
 
 
   if(rotation){
     map.getView().setRotation(Math.PI);
    
-
   }
-  document.getElementById("map").style.display = "none";
 
+  toggle();
   var r='<input id="etape_suivante" type="button" name="envoie" value="Etape suivante">';
   var r2 = '<input id="rejouer" type="button" value="Rejouer">';
   $("#but").append(r2);
   $("#but").append(r);
   document.getElementById('etape_suivante').addEventListener('click',etape_suivante);
   document.getElementById('rejouer').addEventListener('click',animation);
-
-
-
   animation();
   interval = setInterval(animation, vitesse+2000) ;
   interval_ajout = setInterval(ajout, 100) ;
