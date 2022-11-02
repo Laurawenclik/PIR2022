@@ -1,15 +1,17 @@
 var data = [
-  {"interaction" : 1,
-  "etape" : 1,
+  {"interaction" : 1,   // numero de l'interaction
+  "etape" : 1,    // etape 
   "center_ini" : [2.349435,48.8547601],//Long,lat
   "center_f" :  [2.349435,48.8547601],//Long,lat
-  "action" : "zoom",
-  "time" : 2000,
+  "action" : "zoom", // type d'action
+  "time" : 2000, // temps de l'interaction en ms
   "zoom_ini" :19,
   "zoom_f" :  12,
-  "enquete" : 1,
-  "nbr_action": 2,
-  "fdc": "google"},
+  "enquete" : 1,  // le scenario suivi (entre 1 et 4)
+  "nbr_action": 2, // nombre de pan / zoom pour interaction
+  "rotation": true,  // rotation de la carte si besoin 
+  'nbr_iteration' :3, // nombre de fois que l'interaction de déroule 
+  "fdc": "OSM"}, // fdc
   {"interaction" : 2,
   "etape" : 1,
   "center_ini" : [6.7986539,45.6372829],
@@ -20,6 +22,8 @@ var data = [
   "zoom_f" :  15,
   "enquete" : 2,
   "nbr_action": 1,
+  "rotation": false,
+  'nbr_iteration' :2,
   "fdc": "google"},
   {"interaction" : 3,
   "etape" : 1,
@@ -30,6 +34,8 @@ var data = [
   "zoom_ini" :11,
   "zoom_f" :  15,
   "enquete" : 3,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 4,
@@ -41,6 +47,8 @@ var data = [
   "zoom_ini" :11,
   "zoom_f" :  14,
   "enquete" : 4,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 5,
@@ -52,8 +60,10 @@ var data = [
   "zoom_ini" :19,
   "zoom_f" :  12,
   "enquete" : 1,
+  'nbr_iteration' :2,
+  "rotation": true,
   "nbr_action": 4,
-  "fdc": "geoportail"},
+  "fdc": "google"},
   {"interaction" : 6,
   "etape" : 2,
   "center_ini" : [6.7986539,45.6372829],
@@ -63,6 +73,8 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  6,
   "enquete" : 2,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" : 7,
@@ -74,6 +86,8 @@ var data = [
   "zoom_ini" :19,
   "zoom_f" :  14,
   "enquete" : 3,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" :8,
@@ -85,6 +99,8 @@ var data = [
   "zoom_ini" :15,
   "zoom_f" :  11,
   "enquete" : 4,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "OSM"},
   {"interaction" : 9,
@@ -96,6 +112,8 @@ var data = [
   "zoom_ini" :16,
   "zoom_f" :  16,
   "enquete" : 1,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 4,
   "fdc": "OSM"},
   {"interaction" : 10,
@@ -107,6 +125,8 @@ var data = [
   "zoom_ini" :18,
   "zoom_f" :  8,
   "enquete" : 2,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 11,
@@ -118,6 +138,8 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  8,
   "enquete" : 3,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "geoportail"},
   {"interaction" : 12,
@@ -129,6 +151,8 @@ var data = [
   "zoom_ini" :8,
   "zoom_f" :  8,
   "enquete" : 4,
+  "rotation": false,
+  'nbr_iteration' :2,
   "nbr_action": 1,
   "fdc": "geoportail"}
 ];
@@ -149,13 +173,17 @@ var centre_f_g;
 var centre_ini_g
 var numero_enquete;
 var etape;
+var nbr_iteration_t;
+var rotation;
 var iteratin_max = data.length/4;
 var nbr_action;
 var nbr_iteration = 0;
+var repetition = false;
+
 // récupération des élèment HTML
 var but = document.getElementById("but");
 var slider = document.getElementById("myRange");
-var text = document.getElementById("desorientation");
+//var text = document.getElementById("desorientation");
 
 var valeur_slider = document.getElementById("valeur_slider");
 // permet de mettre à jour la valeur du slider
@@ -236,20 +264,12 @@ function ajout(){
   let date = Date.now()
   let zoom;
   let coord;
-  if(fdc == "google"){
-    zoom = map_g.getZoom();
-    let so = [map_g.getBounds().getSouthWest().lat(),map_g.getBounds().getSouthWest().lng()];
-    let ne =  [map_g.getBounds().getNorthEast().lat(),map_g.getBounds().getNorthEast().lng()];
-    let so_t = ol.proj.transform(so,  'EPSG:4326','EPSG:3857');
-    let ne_t = ol.proj.transform(ne, 'EPSG:4326','EPSG:3857');
-    coord = [so_t[0],so_t[0],ne_t[1],ne_t[1]];
 
-  }else{
-    zoom = map.getView().getZoom();
-    coord = map.getView().calculateExtent(map.getSize()); 
-  }
+  zoom = map.getView().getZoom();
+  coord = map.getView().calculateExtent(map.getSize()); 
+  
 
-  tab.push([date,zoom,coord,etape])
+  tab.push([date,zoom,coord,etape,nbr_iteration,repetition,rotation])
 }
 
 /*
@@ -257,61 +277,17 @@ fonction animation : permet de créer une animation de la carte (zoom ou pan )
 */
 function animation(){
   let etat_etape = etape;
-  if(fdc == "google"){
-    map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
-    map_g.setZoom(zoom_ini);
-    // création d'une vue OL 
-    const view_g = new ol.View({
-      center: centre_ini,
-      zoom: zoom_ini
-    });
-    //synchronisation de la vue avec la cart google
-    function sync() {
-      const center = ol.proj.transform(view_g.getCenter(), 'EPSG:3857', 'EPSG:4326');
-      const cameraOptions = {
-        center: new google.maps.LatLng(center[1], center[0]),
-        zoom: view_g.getZoom()
-      };
-      map_g.moveCamera(cameraOptions);
-    }
-    
-    view_g.on(['change:center', 'change:resolution'], sync);
+  nbr_iteration +=1;
+  if (nbr_iteration > nbr_iteration_t){
+    repetition = true;
+  }
 
-    let liste_animation = [];
-    for (let k = 0; k<nbr_action;k++){
-      let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
-      let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
-      liste_animation.push(
-      {
-      duration: vitesse/nbr_action,
-      center: centre_f_intermediaire,
-      zoom: zoom_f_intermediaire
-      }
-      )
-    }
-      
-    fullanimation_g(liste_animation, 0, function() {
-      nbr_iteration +=1;
-    })
+ 
 
-    function fullanimation_g(list, i, callback) {
-      view_g.animate(list[i], function() {
-        ++i;
-        if (i >= list.length) {
-          callback(i);
-        }else if(etape != etat_etape) {
-          callback(i);
-        } else {
-          fullanimation_g(list, i, callback);
-        }
-      });
-    }
-    
-  }else{
-    map.getView().setCenter(centre_ini);
-    map.getView().setZoom(zoom_ini);
-    let liste_animation = [];
-    for (let k = 0; k<nbr_action;k++){
+  map.getView().setCenter(centre_ini);
+  map.getView().setZoom(zoom_ini);
+  let liste_animation = [];
+  for (let k = 0; k<nbr_action;k++){
       let centre_f_intermediaire = [centre_ini[0] + (k+1)*(centre_f[0]-centre_ini[0])/nbr_action,centre_ini[1] + (k+1)*(centre_f[1]-centre_ini[1])/nbr_action];
       let zoom_f_intermediaire = zoom_ini + (k+1)*(zoom_f-zoom_ini)/nbr_action;
       liste_animation.push(
@@ -321,36 +297,44 @@ function animation(){
         zoom: zoom_f_intermediaire
       }
       )
-    }
+  }
       
-    fullanimation(liste_animation, 0, function() {
-      nbr_iteration +=1;
-    })
+  fullanimation(liste_animation, 0, function() {
+      console.log("fin");
+      if (nbr_iteration >= nbr_iteration_t){
+        clearInterval(interval);
+      }
+  })
 
-    function fullanimation(list, i, callback) {
+  function fullanimation(list, i, callback) {
       map.getView().animate(list[i], function() {
         ++i;
         if (i >= list.length) {
           callback(i);
+          i
         }else if(etape != etat_etape) {
           callback(i);
         } else {
           fullanimation(list, i, callback);
         }
       });
-    }
-
   }
+
+  
 
 
 }
+
+
+
+
 /*
 fonction fin : création des fichiers d'export 
 */
 function fin(){
   clearInterval(interval);
   clearInterval(interval_ajout);
-  let csvContent = "data:text/csv;charset=utf-8," +"time,zoom,xmin,ymin,xmax,ymax,etape\n"
+  let csvContent = "data:text/csv;charset=utf-8," +"time,zoom,xmin,ymin,xmax,ymax,etape,n_iteration,repetition,rotation\n"
     + tab.map(e => e.join(",")).join("\n");
   var encodedUri = encodeURI(csvContent);
   var link = document.createElement("a");
@@ -362,7 +346,7 @@ function fin(){
   
 
   
-  let csvContent2 = "data:text/csv;charset=utf-8," +"etape,desorientation,iteration,avis\n"
+  let csvContent2 = "data:text/csv;charset=utf-8," +"etape,desorientation,iteration\n"
     + tab_desorientation.map(e => e.join(",")).join("\n");
   var encodedUri2 = encodeURI(csvContent2);
   var link2 = document.createElement("a");
@@ -372,8 +356,7 @@ function fin(){
   document.body.appendChild(link2); 
   link2.click();
 
-  document.getElementById('etape_suivante').removeEventListener('click',etape_suivante);
-
+  window.location = 'enquete_question.html'
 }
 
 /*
@@ -381,18 +364,23 @@ fonction etape_suivante : fonction récursive, récupère les donnée de l'etape
 */
 function etape_suivante(){
   //récupération de la valeur du slider
-  tab_desorientation.push([etape,slider.value,nbr_iteration,text.value]);
+  tab_desorientation.push([etape,slider.value,nbr_iteration]);
   //réinitialisation du slider
   slider.value = 2;
-  text.value = "";
+  // text.value = "";
   valeur_slider.innerHTML = 2;
-  
+  repetition = false;
+  if(rotation){
+    map.getView().setRotation(0);
+    
+  }
   if(etape < iteratin_max ){
+
     if(etape == iteratin_max-1){
       document.getElementById('etape_suivante').value = "fin";
     }
     etape +=1;
-    nbr_iteration = -1;
+    nbr_iteration = 0;
     clearInterval(interval);
     var id = (etape-1)*4+numero_enquete-1;
     centre_ini = ol.proj.fromLonLat(data[id]["center_ini"]);
@@ -402,22 +390,22 @@ function etape_suivante(){
     vitesse = data[id]["time"];
     action = data[id]["action"];
     fdc = data[id]["fdc"];
-    centre_f_g = ol.proj.transform(centre_f, 'EPSG:3857', 'EPSG:4326');
-    centre_ini_g = ol.proj.transform(centre_ini, 'EPSG:3857', 'EPSG:4326');
+    nbr_iteration_t = data[id]["nbr_iteration"];
+    rotation = data[id]["rotation"];
     nbr_action = data[id]["nbr_action"];
-    if(fdc == "google"){
-      map_g.setCenter({lat: centre_ini_g[1], lng: centre_ini_g[0]}); 
-      map_g.setZoom(zoom_ini);
-    }else{
-      map.getView().setCenter(centre_ini);
-      map.getView().setZoom(zoom_ini);
+    if(rotation){
+      map.getView().setRotation(Math.PI);
+      map_g.setHeading(180);
     }
+
+    map.getView().setCenter(centre_ini);
+    map.getView().setZoom(zoom_ini);
+
     toggle();
     animation();
     interval = setInterval(animation,  vitesse+1000) ;
         
   }else{
-    
     fin()
   }
 }
@@ -440,12 +428,17 @@ function debut(value) {
   fdc = data[value-1]["fdc"];
   nbr_action = data[value-1]["nbr_action"];
   etape = 1;
+  nbr_iteration_t = data[value-1]["nbr_iteration"];
+  rotation = data[value-1]["rotation"];
   centre_f_g = ol.proj.transform(centre_f, 'EPSG:3857', 'EPSG:4326');
   centre_ini_g = ol.proj.transform(centre_ini, 'EPSG:3857', 'EPSG:4326');
+
+
   map_g = new google.maps.Map(document.getElementById("map_g"), {
     center: { lat: centre_ini_g[1], lng: centre_ini_g[0] },
-    zoom: zoom_ini
+    zoom: zoom_ini,
   });
+  
   map = new ol.Map({
     /* Appel des couches de la carte */
     layers: couches,
@@ -457,13 +450,34 @@ function debut(value) {
         zoom: zoom_ini
     })
   });
-  document.getElementById("map").style.display = "none";
 
+  function sync() {
+    const center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+
+    const cameraOptions = {
+      center: new google.maps.LatLng(center[1], center[0]),
+      zoom: map.getView().getZoom(),
+    };
+    map_g.moveCamera(cameraOptions);
+  }
+  
+  map.getView().on(['change:center', 'change:resolution'], sync);
+
+
+  if(rotation){
+    map.getView().setRotation(Math.PI);
+   
+  }
+
+  toggle();
   var r='<input id="etape_suivante" type="button" name="envoie" value="Etape suivante">';
+  var r2 = '<input id="rejouer" type="button" value="Rejouer">';
+  $("#but").append(r2);
   $("#but").append(r);
   document.getElementById('etape_suivante').addEventListener('click',etape_suivante);
+  document.getElementById('rejouer').addEventListener('click',animation);
   animation();
-  interval = setInterval(animation, vitesse+1000) ;
+  interval = setInterval(animation, vitesse+2000) ;
   interval_ajout = setInterval(ajout, 100) ;
 }
 
@@ -471,7 +485,3 @@ function debut(value) {
 
   
 
-
-
- 
- 
