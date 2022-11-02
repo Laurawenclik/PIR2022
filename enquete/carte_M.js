@@ -301,7 +301,7 @@ function animation(){
       
   fullanimation(liste_animation, 0, function() {
       console.log("fin");
-      if (nbr_iteration > nbr_iteration_t){
+      if (nbr_iteration >= nbr_iteration_t){
         clearInterval(interval);
       }
   })
