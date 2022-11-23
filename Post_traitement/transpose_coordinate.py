@@ -69,12 +69,19 @@ for k in range(len(fixation)):
             if float(fixation["norm_pos_y"][k]) > box_carte[1] and float(fixation["norm_pos_y"][k]) < box_carte[3]:
 
                 box_coordinate,zoom,etape,n_iteration,repetition,rotation = box_coord(fixation["world_timestamp"][k])
-            # on calcul la position relative du point dans la carte
-                x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
-                y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
-                x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0] )
-                y_coord = box_coordinate[1] + y_relatif*(box_coordinate[3]-box_coordinate[1] )
-                coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
+                 # on calcul la position relative du point dans la carte
+                if(rotation == False):
+                    x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
+                    y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
+                    x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0] )
+                    y_coord = box_coordinate[1] + y_relatif*(box_coordinate[3]-box_coordinate[1] )
+                    coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
+                else:
+                    x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
+                    y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
+                    x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0])
+                    y_coord = box_coordinate[1] + (1-y_relatif)*(box_coordinate[3]-box_coordinate[1])
+                    coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
 
 
 with open('resultat_enquete/coord_fixation_on_map.csv', 'w', newline='') as file:
