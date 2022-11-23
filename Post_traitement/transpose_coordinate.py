@@ -44,15 +44,21 @@ def box_coord(timestamp):
     box = [0,0,0,0]
     zoom = 0
     etape = 1
+    n_iteration = 0
+    repetition = 0
+    rotation = 0
     for t in range(len(resultat)):
         if (timestamp+offset)*1000 >= resultat["time"][t]:
             zoom = resultat["zoom"][t]
             etape = resultat["etape"][t]
             box = [float(resultat["xmin"][t]),float(resultat["ymin"][t]),float(resultat["xmax"][t]),float(resultat["ymax"][t])]
+            n_iteration = resultat["n_iteration"][t]
+            repetition = resultat["repetition"][t]
+            rotation = resultat["rotation"][t]
             continue
         else:
             break
-    return box,zoom,etape
+    return box,zoom,etape,n_iteration,repetition,rotation
 
 
 for k in range(len(fixation)):
@@ -62,17 +68,24 @@ for k in range(len(fixation)):
         if float(fixation["norm_pos_x"][k]) > box_carte[0] and float(fixation["norm_pos_x"][k]) < box_carte[2]:   
             if float(fixation["norm_pos_y"][k]) > box_carte[1] and float(fixation["norm_pos_y"][k]) < box_carte[3]:
 
-                box_coordinate,zoom,etape = box_coord(fixation["world_timestamp"][k])
-            # on calcul la position relative du point dans la carte
-                x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
-                y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
-                x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0] )
-                y_coord = box_coordinate[1] + y_relatif*(box_coordinate[3]-box_coordinate[1] )
-                coord_fixation.append([id,x_coord,y_coord,zoom,etape])
+                box_coordinate,zoom,etape,n_iteration,repetition,rotation = box_coord(fixation["world_timestamp"][k])
+                 # on calcul la position relative du point dans la carte
+                if(rotation == False):
+                    x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
+                    y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
+                    x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0] )
+                    y_coord = box_coordinate[1] + y_relatif*(box_coordinate[3]-box_coordinate[1] )
+                    coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
+                else:
+                    x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
+                    y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
+                    x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0])
+                    y_coord = box_coordinate[1] + (1-y_relatif)*(box_coordinate[3]-box_coordinate[1])
+                    coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
 
 
 with open('resultat_enquete/coord_fixation_on_map.csv', 'w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["id_fixation","x","y","zoom","etape"]) # rajouter le zoom
+    writer.writerow(["id_fixation","x","y","zoom","etape","n_iteration","repetition","rotation"]) # rajouter le zoom
     for i in range(len(coord_fixation)):
         writer.writerow(coord_fixation[i])
