@@ -79,7 +79,7 @@ for k in range(len(fixation)):
                 else:
                     x_relatif = (float(fixation["norm_pos_x"][k])-box_carte[0])/(box_carte[2]-box_carte[0])
                     y_relatif = (float(fixation["norm_pos_y"][k])-box_carte[1])/(box_carte[3]-box_carte[1])
-                    x_coord = box_coordinate[0] + x_relatif*(box_coordinate[2]-box_coordinate[0])
+                    x_coord = box_coordinate[0] + (1-x_relatif)*(box_coordinate[2]-box_coordinate[0])
                     y_coord = box_coordinate[1] + (1-y_relatif)*(box_coordinate[3]-box_coordinate[1])
                     coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation])
 
