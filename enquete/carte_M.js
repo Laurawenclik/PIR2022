@@ -9,7 +9,7 @@ var data = [
   "zoom_f" :  12,
   "enquete" : 1,  // le scenario suivi (entre 1 et 4)
   "nbr_action": 2, // nombre de pan / zoom pour interaction
-  "rotation": true,  // rotation de la carte si besoin 
+  "rotation": false,  // rotation de la carte si besoin 
   'nbr_iteration' :3, // nombre de fois que l'interaction de déroule 
   "fdc": "OSM"}, // fdc
   {"interaction" : 2,
@@ -52,9 +52,9 @@ var data = [
   "nbr_action": 1,
   "fdc": "google"},
   {"interaction" : 5,
-  "etape" : 4,
-  "center_ini" : [6.7986539,45.6372829],
-  "center_f" :  [6.7986539,45.6372829],
+  "etape" : 2,
+  "center_ini" : [2.349435,48.8547601],
+  "center_f" :  [2.349435,48.8547601],
   "action" : "dezoom",
   "time" : 5000,
   "zoom_ini" :19,
@@ -63,7 +63,7 @@ var data = [
   'nbr_iteration' :2,
   "rotation": true,
   "nbr_action": 4,
-  "fdc": "google"},
+  "fdc": "OSM"},
   {"interaction" : 6,
   "etape" : 2,
   "center_ini" : [6.7986539,45.6372829],
