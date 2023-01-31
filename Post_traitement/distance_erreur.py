@@ -10,7 +10,6 @@ assert os.path.exists(path_to_fixation)
 point = pd.read_csv(path_to_fixation)
 
 coordonnee_point_pixel = [[18,1080-140-10],[1132,1080-140-10],[8+571,1080-(300+140)],[18,(1080-(600+140-10))],[1132,(1080-(600+140-10))]]
-# box_carte = [8/1920,(1080-(600+140))/1080,(1142+8)/1920,(1080-140)/1080] # a calculer en pourcentage (xmin,ymin,xmax,ymax)
 taille_ecran_pixel =[1920,1080]
 
 point_liste =[[],[],[],[],[]]
