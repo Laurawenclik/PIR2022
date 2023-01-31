@@ -37,7 +37,7 @@ resultat = pd.read_csv(path_to_resultat)
 
 coord_fixation =[]
 
-box_carte = [8/1280,(960-(720+140))/960,(1080+8)/1280,(720-140)/960] # a calculer en pourcentage (xmin,ymin,xmax,ymax)
+box_carte = [8/1280,(960-(720+153))/960,(1080+8)/1280,(720-140)/960] # a calculer en pourcentage (xmin,ymin,xmax,ymax)
 
 
 time_repetition = [[],[],[],[]]
@@ -56,7 +56,6 @@ temps_etape = []
 for k in range(len(time_repetition)):
     temps_etape.append(time_repetition[k][1][0] - time_repetition[k][0][0])
 
-print(temps_etape)
 #récupération de l'état de la carte au temps timestamp 
 def box_coord(timestamp):
     box = [0,0,0,0]
@@ -109,7 +108,7 @@ for k in range(len(fixation)):
                     coord_fixation.append([id,x_coord,y_coord,zoom,etape,n_iteration,repetition,rotation,stop_it])
 
 
-with open('resultat_enquete/coord_fixation_on_map_julien.csv', 'w', newline='') as file:
+with open('resultat_enquete/coord_fixation_on_map_margaux.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["id_fixation","x","y","zoom","etape","n_iteration","repetition","rotation","stop_iteration"]) # rajouter le zoom
     for i in range(len(coord_fixation)):
